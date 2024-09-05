@@ -8,6 +8,7 @@ export class ResponseBuilder<T> {
     private payload: ResponsePayload<T | {}> = {
         data: {} as T | {},
         statusCode: ResponseCodeEnum.SUCCESS,
+        message: "",
     };
 
     constructor(data?: T) {
