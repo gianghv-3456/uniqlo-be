@@ -1,107 +1,157 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put,
+} from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpadteImageDto } from "./dto/update-image.dto";
+import { ResponseBuilder } from "src/utils/response-builder";
+import { ResponseCodeEnum } from "src/common/constants/response-code.enum";
 
-@Controller('products')
+@Controller("products")
 export class ProductController {
-
-    constructor(private readonly productService: ProductService) { };
+    constructor(private readonly productService: ProductService) {}
 
     @Get()
     async getAll() {
         const result = await this.productService.getAll();
         result.sort((a, b) => a.id - b.id);
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Get successful product",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get successful product",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful product")
+            .withData(result)
+            .build();
     }
 
-    @Get(':id')
-    async getById(@Param('id', ParseIntPipe) id: number) {
-
+    @Get(":id")
+    async getById(@Param("id", ParseIntPipe) id: number) {
         const result = await this.productService.getById(id);
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Get successful product",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get successful product",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful product")
+            .withData(result)
+            .build();
     }
 
-    @Post('create')
+    @Post("create")
     async create(@Body() body: CreateProductDto) {
         const result = await this.productService.create(body);
 
         if (result?.severity === "ERROR") {
-            throw new BadRequestException(result.detail);
+            // throw new BadRequestException(result.detail);
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.BAD_REQUEST)
+                .withMessage(result.detail)
+                .build();
         }
 
         const { images } = body;
-        const productImages = images.filter(image => image !== "");
+        const productImages = images.filter((image) => image !== "");
 
         if (productImages.length > 0) {
             try {
-                await this.productService.createImages(result[0], productImages);
+                await this.productService.createImages(
+                    result[0],
+                    productImages
+                );
             } catch (error) {
                 console.log(error);
             }
         }
 
-        return {
-            statusCode: HttpStatus.CREATED,
-            message: "Create successful product",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.CREATED,
+        //     message: "Create successful product",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.CREATED)
+            .withMessage("Create successful product")
+            .withData(result)
+            .build();
     }
 
-    @Delete(':id')
-    async delete(@Param('id', ParseIntPipe) id: number) {
-
+    @Delete(":id")
+    async delete(@Param("id", ParseIntPipe) id: number) {
         // const resultDeleteImages = await this.productService.deleteImages(id);
 
         const result = await this.productService.delete(id);
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Delete successful product",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Delete successful product",
+        //     data: result,
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Delete successful product")
+            .build();
     }
 
-    @Put('update-image')
+    @Put("update-image")
     async updateImage(@Body() body: UpadteImageDto) {
-
         const result = await this.productService.updateImage(body);
 
         if (result?.severity === "ERROR") {
-            throw new BadRequestException(result.detail);
+            // throw new BadRequestException(result.detail);
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.BAD_REQUEST)
+                .withMessage(result.detail)
+                .build();
         }
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Update successful image",
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Update successful image",
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Update successful image")
+            .build();
     }
 
-    @Put('update')
+    @Put("update")
     async update(@Body() body: any) {
-
         body.discountPercentage = body.discount_percentage;
         delete body.discount_percentage;
 
         const result = await this.productService.update(body);
 
         if (result?.severity === "ERROR") {
-            throw new BadRequestException(result.detail);
+            // throw new BadRequestException(result.detail);
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.BAD_REQUEST)
+                .withMessage(result.detail)
+                .build();
         }
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Update successful product",
-            data: "oke"
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Update successful product",
+        //     data: "oke",
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Update successful product")
+            .build();
     }
 }

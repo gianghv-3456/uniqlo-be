@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, NotFoundException, Param, ParseIntPipe, Put, Req, UnauthorizedException } from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Put,
+    Req,
+    UnauthorizedException,
+} from "@nestjs/common";
 import { AccountService } from "./account.service";
 import { Request } from "express";
 import { JwtService } from "@nestjs/jwt";
@@ -9,79 +21,127 @@ import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { UpdateWishlistDto } from "./dto/update-wishlists.dto";
 import { ROLE } from "src/common/constants/role.enum";
 import { UpdateStatusDto } from "./dto/update-status.dto";
+import { ResponseBuilder } from "src/utils/response-builder";
+import { ResponseCodeEnum } from "src/common/constants/response-code.enum";
 
-@Controller('accounts')
+@Controller("accounts")
 export class AccountController {
     constructor(
         private readonly accountService: AccountService,
         private readonly jwtService: JwtService
-    ) { };
+    ) {}
 
     @Get()
     async getAccounts() {
         let result = await this.accountService.getAccounts();
 
-        result = result.filter(account => account.role !== ROLE.ADMIN);
+        result = result.filter((account) => account.role !== ROLE.ADMIN);
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Get account successfully",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get account successfully",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withData(result)
+            .withMessage("Get account successfully")
+            .build();
     }
 
-    @Put('change-password')
-    async changePassword(@Body() body: UpdatePasswordDto, @Req() request: Request) {
-
-        const authHeader = request.headers['authorization'];
+    @Put("change-password")
+    async changePassword(
+        @Body() body: UpdatePasswordDto,
+        @Req() request: Request
+    ) {
+        const authHeader = request.headers["authorization"];
         const token = authHeader.substring(7);
 
         if (!token) {
-            throw new UnauthorizedException("Missing token");
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.UNAUTHORIZED)
+                .withMessage("Missing token")
+                .build();
         }
 
-        const infoToken = await this.jwtService.verifyAsync(token, { secret: JWT_CONFIG.ACCESS_KEY });
+        const infoToken = await this.jwtService.verifyAsync(token, {
+            secret: JWT_CONFIG.ACCESS_KEY,
+        });
         const { id } = infoToken;
 
         const accountFind = await this.accountService.getAccountById(id);
 
         if (!accountFind) {
-            throw new NotFoundException("Not found account");
+            // throw new NotFoundException("Not found account");
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.NOT_FOUND)
+                .withMessage("Not found account")
+                .build();
         }
 
-        const checkOldPassword = bcrypt.compareSync(body.oldPassword, accountFind.password);
+        const checkOldPassword = bcrypt.compareSync(
+            body.oldPassword,
+            accountFind.password
+        );
         if (!checkOldPassword) {
-            throw new BadRequestException("Old password wrong");
+            // throw new BadRequestException("Old password wrong");
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.BAD_REQUEST)
+                .withMessage("Old password wrong")
+                .build();
         }
 
-        const checkNewPassword = bcrypt.compareSync(body.newPassword, accountFind.password);
+        const checkNewPassword = bcrypt.compareSync(
+            body.newPassword,
+            accountFind.password
+        );
         if (checkNewPassword) {
-            throw new BadRequestException("The new password matches the old password")
+            // throw new BadRequestException(
+            //     "The new password matches the old password"
+            // );
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.BAD_REQUEST)
+                .withMessage("The new password matches the old password")
+                .build();
         }
 
-        const newPasswordHash = bcrypt.hashSync(body.newPassword, bcrypt.genSaltSync());
+        const newPasswordHash = bcrypt.hashSync(
+            body.newPassword,
+            bcrypt.genSaltSync()
+        );
         accountFind.password = newPasswordHash;
-        const resultChange = await this.accountService.changePassword(accountFind);
+        const resultChange =
+            await this.accountService.changePassword(accountFind);
 
         if (resultChange) {
-            return {
-                statusCode: HttpStatus.OK,
-                message: "Change password successfully",
-                data: resultChange
-            }
+            // return {
+            //     statusCode: HttpStatus.OK,
+            //     message: "Change password successfully",
+            //     data: resultChange,
+            // };
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.SUCCESS)
+                .withMessage("Change password successfully")
+                .withData(resultChange)
+                .build();
         }
     }
 
-    @Put('update')
+    @Put("update")
     async update(@Req() request: Request, @Body() body: AcocuntUpdateDto) {
-
-        const authHeader = request.headers['authorization'];
+        const authHeader = request.headers["authorization"];
         const token = authHeader.substring(7);
         if (!token) {
-            throw new UnauthorizedException("Missing token");
+            // throw new UnauthorizedException("Missing token");
+            return new ResponseBuilder()
+                .withCode(ResponseCodeEnum.UNAUTHORIZED)
+                .withMessage("Missing token")
+                .build();
         }
 
-        const infoToken = await this.jwtService.verifyAsync(token, { secret: JWT_CONFIG.ACCESS_KEY });
+        const infoToken = await this.jwtService.verifyAsync(token, {
+            secret: JWT_CONFIG.ACCESS_KEY,
+        });
         const { id } = infoToken;
 
         const accountUpdate = { id, ...body };
@@ -93,49 +153,65 @@ export class AccountController {
         delete data.image_path;
         delete data.password;
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Information updated successfully",
-            data
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Information updated successfully",
+        //     data,
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Information updated successfully")
+            .withData(data)
+            .build();
     }
 
-    @Put('change-wishlists')
+    @Put("change-wishlists")
     async changeWishlist(@Body() body: UpdateWishlistDto) {
-
         const result = await this.accountService.changeWishlist(body);
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Change wishlist successfully",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Change wishlist successfully",
+        //     data: result,
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Change wishlist successfully")
+            .withData(result)
+            .build();
     }
 
-    @Get('get-wishlists-by-account/:id')
-    async getWishlistByAccount(@Param('id', ParseIntPipe) id: number) {
-
+    @Get("get-wishlists-by-account/:id")
+    async getWishlistByAccount(@Param("id", ParseIntPipe) id: number) {
         const result = await this.accountService.getWishlistByAccount(id);
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Get wishlist successfully",
-            data: result
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get wishlist successfully",
+        //     data: result,
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get wishlist successfully")
+            .withData(result)
+            .build();
     }
 
-    @Put('change-status')
+    @Put("change-status")
     async updateStatus(@Body() body: UpdateStatusDto) {
-
         const result = await this.accountService.changeStatus(body);
 
         console.log(result);
 
-
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Update status successfully",
-            data: body
-        }
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Update status successfully",
+        //     data: body,
+        // };
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Update status successfully")
+            .withData(body)
+            .build();
     }
 }
