@@ -7,15 +7,24 @@ import { UpdateBrandDto } from "./dto/update-brand.dto";
 
 @Injectable()
 export class BrandService {
-
     constructor(
-        @InjectRepository(Brand) private readonly brandRepository: Repository<Brand>,
+        @InjectRepository(Brand)
+        private readonly brandRepository: Repository<Brand>,
         @InjectEntityManager() private readonly entityManager: EntityManager,
         private readonly dataSource: DataSource
-    ) { };
+    ) {}
 
     async getAll() {
-        return await this.brandRepository.find({ relations: ['category'] });
+        return await this.brandRepository.find({ relations: ["category"] });
+    }
+
+    async getAllV2(limit, page) {
+        const skip = (page - 1) * limit;
+        return await this.brandRepository.findAndCount({
+            relations: ["category"],
+            skip: skip,
+            take: limit,
+        });
     }
 
     async create(brand: CreateBrandDto) {
@@ -27,8 +36,11 @@ export class BrandService {
         await queryRunner.startTransaction();
 
         try {
-            const result = await queryRunner.manager.query(`INSERT INTO types (name, logo, category_id) 
-            VALUES($1, $2, $3) RETURNING *;`, [name, logo, category_id]);
+            const result = await queryRunner.manager.query(
+                `INSERT INTO types (name, logo, category_id) 
+            VALUES($1, $2, $3) RETURNING *;`,
+                [name, logo, category_id]
+            );
             await queryRunner.commitTransaction();
             return result;
         } catch (err) {

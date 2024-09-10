@@ -7,6 +7,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    Query,
 } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { OrderService } from "./order.service";
@@ -36,6 +37,28 @@ export class OrderController {
         return new ResponseBuilder()
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Get successful variation")
+            .withData(result)
+            .build();
+    }
+
+    @Get("/v2")
+    async getOrdersV2(@Query() query) {
+        const { limit, page } = query;
+        const [result, total] = await this.orderService.getOrdersV2(
+            limit,
+            page
+        );
+
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful variation")
+            .withData({
+                items: result,
+                meta: {
+                    total: total,
+                    page: page,
+                },
+            })
             .build();
     }
 

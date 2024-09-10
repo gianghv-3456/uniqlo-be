@@ -9,6 +9,7 @@ import {
     ParseIntPipe,
     Post,
     Put,
+    Query,
 } from "@nestjs/common";
 import { BrandService } from "./brand.service";
 import { CreateBrandDto } from "./dto/create-brand.dto";
@@ -33,6 +34,28 @@ export class BrandController {
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Get successful brand")
             .withData(result)
+            .build();
+    }
+
+    @Get("/v2")
+    async getAllV2(@Query() query) {
+        const { limit, page } = query;
+        const [result, total] = await this.brandService.getAllV2(limit, page);
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get successful brand",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful brand")
+            .withData({
+                items: result,
+                meta: {
+                    total: total,
+                    page: page,
+                },
+            })
             .build();
     }
 

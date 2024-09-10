@@ -24,6 +24,15 @@ export class ProductService {
         });
     }
 
+    async getAllV2(limit, page) {
+        const skip = (page - 1) * limit;
+        return await this.productRepository.findAndCount({
+            relations: ["brand", "images", "variations", "category"],
+            skip: skip,
+            take: limit,
+        });
+    }
+
     async getById(id: number) {
         return await this.productRepository.findOne({
             where: { id },
