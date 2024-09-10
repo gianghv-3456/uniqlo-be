@@ -34,6 +34,7 @@ export class CategoryController {
         return new ResponseBuilder()
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Get successful category")
+            .withData(result)
             .build();
     }
 

@@ -1,25 +1,41 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Account } from "./entity/account.entity";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, Not, Repository } from "typeorm";
 import { LoginDto } from "../auth/dto/login.dto";
 import { AcocuntUpdateDto } from "./dto/account-update.dto";
 import { RegisterDto } from "../auth/dto/register.dto";
 import { UpdateWishlistDto } from "./dto/update-wishlists.dto";
 import { Wishlist } from "./entity/wishlist.entity";
 import { UpdateStatusDto } from "./dto/update-status.dto";
+import { ROLE } from "src/common/constants/role.enum";
 
 @Injectable()
 export class AccountService {
-
     constructor(
-        @InjectRepository(Account) private readonly accountRepository: Repository<Account>,
-        @InjectRepository(Wishlist) private readonly wishlistRepository: Repository<Wishlist>,
+        @InjectRepository(Account)
+        private readonly accountRepository: Repository<Account>,
+        @InjectRepository(Wishlist)
+        private readonly wishlistRepository: Repository<Wishlist>,
         private readonly dataSource: DataSource
-    ) { };
+    ) {}
 
     async getAccounts() {
-        return await this.accountRepository.find({ relations: ['orders'] });
+        return await this.accountRepository.find({ relations: ["orders"] });
+    }
+
+    async getAccountsV2(limit, page) {
+        const skip = (page - 1) * limit;
+        // result = result.filter((account) => account.role !== ROLE.ADMIN);
+
+        return await this.accountRepository.findAndCount({
+            relations: ["orders"],
+            skip: skip,
+            take: limit,
+            where: {
+                role: Not(ROLE.ADMIN),
+            },
+        });
     }
 
     async getAccountById(id: number) {
@@ -35,8 +51,11 @@ export class AccountService {
         await queryRunner.startTransaction();
 
         try {
-            const result = await queryRunner.manager.query(`INSERT INTO accounts (name, email, password, birthday) 
-            VALUES($1, $2, $3, $4) RETURNING *;`, [name, email, password, birthday]);
+            const result = await queryRunner.manager.query(
+                `INSERT INTO accounts (name, email, password, birthday) 
+            VALUES($1, $2, $3, $4) RETURNING *;`,
+                [name, email, password, birthday]
+            );
             await queryRunner.commitTransaction();
             return result;
         } catch (err) {
@@ -50,7 +69,10 @@ export class AccountService {
 
     async login(loginDto: LoginDto) {
         const { email, role } = loginDto;
-        const result = await this.accountRepository.findOne({ where: { email, role }, relations: ['carts'] });
+        const result = await this.accountRepository.findOne({
+            where: { email, role },
+            relations: ["carts"],
+        });
         console.log(result);
         return result;
     }
@@ -72,13 +94,14 @@ export class AccountService {
 
     async changeWishlist(data: UpdateWishlistDto) {
         const { accountId, productId } = data;
-        const wishlistFind = await this.wishlistRepository.findOne({ where: { account: { id: accountId }, product: { id: productId } } });
+        const wishlistFind = await this.wishlistRepository.findOne({
+            where: { account: { id: accountId }, product: { id: productId } },
+        });
 
         if (wishlistFind) {
             const result = await this.wishlistRepository.delete(wishlistFind);
             return result;
         } else {
-
             const { accountId, productId } = data;
 
             const queryRunner = this.dataSource.createQueryRunner();
@@ -87,8 +110,11 @@ export class AccountService {
             await queryRunner.startTransaction();
 
             try {
-                const result = await queryRunner.manager.query(`INSERT INTO wishlists (account_id, product_id) 
-                    VALUES($1, $2) RETURNING *;`, [accountId, productId]);
+                const result = await queryRunner.manager.query(
+                    `INSERT INTO wishlists (account_id, product_id) 
+                    VALUES($1, $2) RETURNING *;`,
+                    [accountId, productId]
+                );
                 await queryRunner.commitTransaction();
                 return result;
             } catch (err) {
@@ -108,7 +134,10 @@ export class AccountService {
         await queryRunner.startTransaction();
 
         try {
-            const result = await queryRunner.manager.query(`SELECT * FROM wishlists WHERE account_id=$1;`, [id]);
+            const result = await queryRunner.manager.query(
+                `SELECT * FROM wishlists WHERE account_id=$1;`,
+                [id]
+            );
             await queryRunner.commitTransaction();
             return result;
         } catch (err) {
@@ -121,7 +150,9 @@ export class AccountService {
     }
 
     async setPassword(id: number) {
-        const accountFind = await this.accountRepository.findOne({ where: { id } });
+        const accountFind = await this.accountRepository.findOne({
+            where: { id },
+        });
 
         if (accountFind.passwordReset !== null) {
             accountFind.password = accountFind.passwordReset;
@@ -132,7 +163,9 @@ export class AccountService {
     }
 
     async changeStatus(data: UpdateStatusDto) {
-        const accountFind = await this.accountRepository.findOne({ where: { id: data.id } });
+        const accountFind = await this.accountRepository.findOne({
+            where: { id: data.id },
+        });
 
         accountFind.active = data.active;
 
