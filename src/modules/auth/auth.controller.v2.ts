@@ -16,11 +16,11 @@ import { DataToken } from "src/common/interfaces/data-token.interface"
 import { JWT_CONFIG } from "src/common/constants/jwt.constant"
 import { Request } from "express"
 import { RegisterDto } from "./dto/register.dto"
-import { ResponseBuilder } from "src/utils/response-builder"
+import { ResponseBuilder2 } from "src/utils/response-builder-v2"
 import { ResponseCodeEnum } from "src/common/constants/response-code.enum"
 
-@Controller("auth")
-export class AuthController {
+@Controller("v2/auth")
+export class AuthControllerV2 {
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService
@@ -36,7 +36,7 @@ export class AuthController {
 
     if (!account) {
       // throw new NotFoundException('Account not found');
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.NOT_FOUND)
         .withMessage("Account not found")
         .build()
@@ -44,7 +44,7 @@ export class AuthController {
 
     if (!account.active) {
       // throw new UnauthorizedException("Account block");
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.UNAUTHORIZED)
         .withMessage("Account block")
         .build()
@@ -54,7 +54,7 @@ export class AuthController {
     if (!account.passwordReset) {
       if (!bcrypt.compareSync(loginDto.password, account.password)) {
         // throw new UnauthorizedException('Incorrect password')
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.UNAUTHORIZED)
           .withMessage("Incorrect password")
           .build()
@@ -65,7 +65,7 @@ export class AuthController {
         !bcrypt.compareSync(loginDto.password, account.passwordReset)
       ) {
         // throw new UnauthorizedException('Incorrect password')
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.UNAUTHORIZED)
           .withMessage("Incorrect password")
           .build()
@@ -75,7 +75,7 @@ export class AuthController {
     const resultSetPassword = await this.accountService.setPassword(account.id)
     if (resultSetPassword.affected !== 1) {
       // throw new BadRequestException("Error update password");
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage("Error update password")
         .build()
@@ -96,7 +96,7 @@ export class AuthController {
     //     message: "Logged in successfully",
     //     data: { ...account, accessToken, refreshToken }
     // }
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Logged in successfully")
       .withData({ ...account, accessToken, refreshToken })
@@ -109,7 +109,7 @@ export class AuthController {
     const token = authHeader.substring(7)
     if (!token) {
       // throw new UnauthorizedException("Missing token");
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.UNAUTHORIZED)
         .withMessage("Missing token")
         .build()
@@ -129,7 +129,7 @@ export class AuthController {
     //     message: "Refresh token successfully",
     //     data: { accessToken, refreshToken }
     // }
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Refresh token successfully")
       .withData({ accessToken, refreshToken })
@@ -144,7 +144,7 @@ export class AuthController {
 
     if (result?.severity === "ERROR") {
       // throw new BadRequestException(result.detail);
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage(result.detail)
         .build()
@@ -155,7 +155,7 @@ export class AuthController {
     //     message: "Register successfully",
     //     data: result
     // }
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.CREATED)
       .withMessage("Register successfully")
       .withData(result)

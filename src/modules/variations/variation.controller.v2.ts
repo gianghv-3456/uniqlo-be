@@ -1,0 +1,145 @@
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+} from "@nestjs/common"
+import { VariationService } from "./variation.service"
+import { CreateVariationDto } from "./dto/create-variation.dto"
+import { UpdateVariationDto } from "./dto/update-variation.dto"
+import { ResponseBuilder2 } from "src/utils/response-builder-v2"
+import { ResponseCodeEnum } from "src/common/constants/response-code.enum"
+
+@Controller("v2/variations")
+export class VariationControllerV2 {
+  constructor(private readonly variationService: VariationService) {}
+
+  @Get()
+  async getAll() {
+    const result = await this.variationService.getAll()
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Get successful variation",
+    //     data: result
+    // }
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get successful variation")
+      .withData(result)
+      .build()
+  }
+
+  @Get("/v2")
+  async getAllV2(@Query() query) {
+    const { limit, page } = query
+    const [result, total] = await this.variationService.getAllV2(limit, page)
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Get successful variation",
+    //     data: result
+    // }
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get successful variation")
+      .withData({
+        items: result,
+        meta: {
+          total: total,
+          page: page,
+        },
+      })
+      .build()
+  }
+
+  @Get("product-id/:id")
+  async getVariationByProductId(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.variationService.getByProductId(id)
+
+    const newReult = result.map((item) => {
+      item.price = parseFloat(item.price as any)
+      return item
+    })
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Get successful variation",
+    //     data: newReult,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get successful variation")
+      .withData(newReult)
+      .build()
+  }
+
+  @Post("create")
+  async create(@Body() body: CreateVariationDto) {
+    const result = await this.variationService.create(body)
+
+    if (result?.severity === "ERROR") {
+      // throw new BadRequestException(result.detail);
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(result.detail)
+        .build()
+    }
+
+    // return {
+    //     statusCode: HttpStatus.CREATED,
+    //     message: "Create successful variation",
+    //     data: result,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.CREATED)
+      .withMessage("Create successful variation")
+      .withData(result)
+      .build()
+  }
+
+  @Delete(":id")
+  async delete(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.variationService.delete(id)
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Delete successful product",
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Delete successful product")
+      .build()
+  }
+
+  @Put("update")
+  async update(@Body() body: UpdateVariationDto) {
+    const result = await this.variationService.update(body)
+
+    if (result.severity === "ERROR") {
+      // throw new BadRequestException(result.detail);
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(result.detail)
+        .build()
+    }
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Update successful image",
+    //     data: result,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Update successful image")
+      .withData(result)
+      .build()
+  }
+}
