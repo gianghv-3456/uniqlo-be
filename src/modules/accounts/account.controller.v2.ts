@@ -50,20 +50,21 @@ export class AccountControllerV2 {
       .build()
   }
 
-  @Get("v2")
-  async getAccountsV2(@Query() query) {
-    const { limit, page } = query
-    let [result, total] = await this.accountService.getAccountsV2(limit, page)
+  @Get("/:id")
+  async getMyProfile(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.accountService.getAccountById(id)
+
+    if (!result) {
+      // throw new NotFoundException("Account not found");
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage("Account not found")
+        .build()
+    }
 
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
-      .withData({
-        items: result,
-        meta: {
-          total: total,
-          page: page,
-        },
-      })
+      .withData(result)
       .withMessage("Get account successfully")
       .build()
   }
