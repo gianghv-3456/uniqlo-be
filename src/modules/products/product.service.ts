@@ -34,7 +34,7 @@ export class ProductService {
   }
 
   async _getAll() {
-    return await this.productRepository.findAndCount({
+    return await this.productRepository.find({
       relations: ["brand", "images", "variations", "category", "collections"],
     })
   }
