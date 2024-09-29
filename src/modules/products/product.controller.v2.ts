@@ -23,7 +23,7 @@ export class ProductControllerV2 {
 
   @Get()
   async getAll() {
-    const result = await this.productService.getAll()
+    const result = await this.productService._getAll()
     result.sort((a, b) => a.id - b.id)
     // return {
     //     statusCode: HttpStatus.OK,
