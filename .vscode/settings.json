@@ -7,7 +7,7 @@
     "window.openFilesInNewWindow": "on",
     "editor.tabSize": 2,
     "editor.minimap.showSlider": "always",
-    "workbench.editor.showTabs": true,
+    "workbench.editor.showTabs": "multiple",
     "eslint.format.enable": true,
     "editor.formatOnSave": true,
     "terminal.integrated.defaultProfile.windows": "Git Bash",
