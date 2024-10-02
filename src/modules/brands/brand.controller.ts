@@ -86,19 +86,11 @@ export class BrandController {
 
     @Put("update")
     async update(@Body() body: UpdateBrandDto) {
-        const data = { ...body, category: body.category_id };
-        delete data.category_id;
+        const result = await this.brandService.update(body);
 
-        const result = await this.brandService.update(data);
-
-        // return {
-        //     statusCode: HttpStatus.OK,
-        //     message: "Update successful category",
-        //     data: result
-        // }
         return new ResponseBuilder()
             .withCode(ResponseCodeEnum.SUCCESS)
-            .withMessage("Update successful category")
+            .withMessage("Update successful brand")
             .withData(result)
             .build();
     }

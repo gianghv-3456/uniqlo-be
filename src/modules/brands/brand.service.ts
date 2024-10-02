@@ -1,25 +1,37 @@
 import { Injectable } from "@nestjs/common";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { Brand } from "./entity/brand.entity";
-import { DataSource, EntityManager, Repository } from "typeorm";
+import { DataSource, EntityManager, In, Repository } from "typeorm";
 import { CreateBrandDto } from "./dto/create-brand.dto";
 import { UpdateBrandDto } from "./dto/update-brand.dto";
+import { Category } from "../categories/entity/category.entity";
 
 @Injectable()
 export class BrandService {
-
     constructor(
-        @InjectRepository(Brand) private readonly brandRepository: Repository<Brand>,
+        @InjectRepository(Brand)
+        private readonly brandRepository: Repository<Brand>,
+        @InjectRepository(Category)
+        private readonly categoryRepository: Repository<Category>,
         @InjectEntityManager() private readonly entityManager: EntityManager,
         private readonly dataSource: DataSource
-    ) { };
+    ) {}
 
     async getAll() {
-        return await this.brandRepository.find({ relations: ['category'] });
+        return await this.brandRepository.find({ relations: ["categories"] });
     }
 
-    async create(brand: CreateBrandDto) {
-        const { name, logo, category_id } = brand;
+    async getAllV2(limit, page) {
+        const skip = (page - 1) * limit;
+        return await this.brandRepository.findAndCount({
+            relations: ["categories"],
+            skip: skip,
+            take: limit,
+        });
+    }
+
+    async create(brandDto: CreateBrandDto) {
+        const { name, logo, category_ids } = brandDto;
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -27,10 +39,27 @@ export class BrandService {
         await queryRunner.startTransaction();
 
         try {
-            const result = await queryRunner.manager.query(`INSERT INTO types (name, logo, category_id) 
-            VALUES($1, $2, $3) RETURNING *;`, [name, logo, category_id]);
+            // Find categories by their IDs
+            const categories = await queryRunner.manager.findByIds(
+                Category,
+                category_ids
+            );
+
+            if (categories.length !== category_ids.length) {
+                throw new Error("One or more categories not found.");
+            }
+
+            // Create the new brand instance
+            const newBrand = new Brand();
+            newBrand.name = name;
+            newBrand.logo = logo;
+            newBrand.categories = categories;
+
+            // Save the brand with its associated categories
+            const savedBrand = await queryRunner.manager.save(Brand, newBrand);
+
             await queryRunner.commitTransaction();
-            return result;
+            return savedBrand;
         } catch (err) {
             await queryRunner.rollbackTransaction();
             console.log(err.message);
@@ -48,11 +77,39 @@ export class BrandService {
         }
     }
 
-    async update(brand: any) {
-        const { id, ...data } = brand;
+    async update(updateBrandDto: UpdateBrandDto) {
+        const { id, category_ids, ...brandData } = updateBrandDto;
+
         try {
-            return await this.brandRepository.update(id, data);
+            // Find the brand by ID
+            const brand = await this.brandRepository.findOne({
+                where: { id },
+                relations: ["categories"],
+            });
+
+            if (!brand) {
+                throw new Error("Brand not found");
+            }
+
+            // Find categories by their IDs using the In() operator
+            const categories = await this.categoryRepository.find({
+                where: { id: In(category_ids) },
+            });
+
+            if (categories.length !== category_ids.length) {
+                throw new Error("One or more categories not found.");
+            }
+
+            // Update brand fields
+            Object.assign(brand, brandData);
+
+            // Update the categories association
+            brand.categories = categories;
+
+            // Save the updated brand entity
+            return await this.brandRepository.save(brand);
         } catch (error) {
+            console.log(error);
             return error;
         }
     }

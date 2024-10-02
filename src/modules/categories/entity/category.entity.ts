@@ -1,8 +1,15 @@
 import { Brand } from "src/modules/brands/entity/brand.entity";
 import { Product } from "src/modules/products/entity/product.entity";
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
-@Entity({ name: 'categories' })
+@Entity({ name: "categories" })
 export class Category {
     @PrimaryGeneratedColumn()
     id: number;
@@ -13,9 +20,9 @@ export class Category {
     @Column({ nullable: false, default: true })
     active: boolean;
 
-    @OneToMany(() => Brand, brand => brand.category)
-    brands: Brand[]
+    @ManyToMany(() => Brand, (brand) => brand.categories)
+    brands: Brand[];
 
-    @OneToMany(() => Product, product => product.category)
-    products: Brand[]
+    @OneToMany(() => Product, (product) => product.category)
+    products: Brand[];
 }
