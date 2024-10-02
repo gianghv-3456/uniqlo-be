@@ -16,6 +16,9 @@ export class UpdateBrandDto {
 
     logo: string;
 
+    @IsNumber()
+    category_id: number;
+
     @IsArray()
     // @ArrayNotEmpty()
     @IsInt({ each: true }) // Ensure each value in the array is an integer

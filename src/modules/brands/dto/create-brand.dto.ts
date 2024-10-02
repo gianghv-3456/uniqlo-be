@@ -13,6 +13,9 @@ export class CreateBrandDto {
 
     logo: string;
 
+    @IsNumber()
+    category_id: number;
+
     @IsArray()
     // @ArrayNotEmpty()
     @IsInt({ each: true }) // Ensures each value in the array is an integer
