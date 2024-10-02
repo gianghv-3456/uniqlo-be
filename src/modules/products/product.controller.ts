@@ -9,6 +9,7 @@ import {
     ParseIntPipe,
     Post,
     Put,
+    Query,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -33,6 +34,29 @@ export class ProductController {
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Get successful product")
             .withData(result)
+            .build();
+    }
+
+    @Get("/v2")
+    async getAllV2(@Query() query) {
+        const { limit, page } = query;
+        const [result, total] = await this.productService.getAllV2(limit, page);
+        result.sort((a, b) => a.id - b.id);
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get successful product",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful product")
+            .withData({
+                items: result,
+                meta: {
+                    total: total,
+                    page: page,
+                },
+            })
             .build();
     }
 

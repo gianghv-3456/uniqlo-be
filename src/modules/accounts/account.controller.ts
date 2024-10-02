@@ -8,6 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Put,
+    Query,
     Req,
     UnauthorizedException,
 } from "@nestjs/common";
@@ -45,6 +46,27 @@ export class AccountController {
         return new ResponseBuilder()
             .withCode(ResponseCodeEnum.SUCCESS)
             .withData(result)
+            .withMessage("Get account successfully")
+            .build();
+    }
+
+    @Get("v2")
+    async getAccountsV2(@Query() query) {
+        const { limit, page } = query;
+        let [result, total] = await this.accountService.getAccountsV2(
+            limit,
+            page
+        );
+
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withData({
+                items: result,
+                meta: {
+                    total: total,
+                    page: page,
+                },
+            })
             .withMessage("Get account successfully")
             .build();
     }

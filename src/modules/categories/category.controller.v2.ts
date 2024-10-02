@@ -13,11 +13,11 @@ import {
 import { CategoryService } from "./category.service"
 import { CreateCategoryDto } from "./dto/create-category.dto"
 import { UpdateCategoryDto } from "./dto/update-category.dto"
-import { ResponseBuilder } from "src/utils/response-builder"
+import { ResponseBuilder2 } from "src/utils/response-builder-v2"
 import { ResponseCodeEnum } from "src/common/constants/response-code.enum"
 
-@Controller("categories")
-export class CategoryController {
+@Controller("v2/categories")
+export class CategoryControllerV2 {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
@@ -31,7 +31,7 @@ export class CategoryController {
     //     message: "Get successful category",
     //     data: result
     // }
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Get successful category")
       .withData(result)
@@ -44,7 +44,7 @@ export class CategoryController {
 
     if (result.severity === "ERROR") {
       // throw new BadRequestException(result.detail);
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage(result.detail)
         .build()
@@ -55,7 +55,7 @@ export class CategoryController {
     //     message: "Create successful category",
     //     data: result,
     // };
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.CREATED)
       .withMessage("Create successful category")
       .withData(result)
@@ -68,7 +68,7 @@ export class CategoryController {
 
     if (result.severity === "ERROR") {
       // throw new BadRequestException(result.detail);
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage(result.detail)
         .build()
@@ -79,7 +79,7 @@ export class CategoryController {
       //     statusCode: HttpStatus.OK,
       //     message: "Delete successful category",
       // };
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.SUCCESS)
         .withMessage("Delete successful category")
         .build()
@@ -95,7 +95,7 @@ export class CategoryController {
     //     message: "Update successful category",
     //     data: result,
     // };
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Update successful category")
       .withData(result)

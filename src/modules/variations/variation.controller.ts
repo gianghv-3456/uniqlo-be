@@ -9,6 +9,7 @@ import {
     ParseIntPipe,
     Post,
     Put,
+    Query,
 } from "@nestjs/common";
 import { VariationService } from "./variation.service";
 import { CreateVariationDto } from "./dto/create-variation.dto";
@@ -33,6 +34,32 @@ export class VariationController {
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Get successful variation")
             .withData(result)
+            .build();
+    }
+
+    @Get("/v2")
+    async getAllV2(@Query() query) {
+        const { limit, page } = query;
+        const [result, total] = await this.variationService.getAllV2(
+            limit,
+            page
+        );
+
+        // return {
+        //     statusCode: HttpStatus.OK,
+        //     message: "Get successful variation",
+        //     data: result
+        // }
+        return new ResponseBuilder()
+            .withCode(ResponseCodeEnum.SUCCESS)
+            .withMessage("Get successful variation")
+            .withData({
+                items: result,
+                meta: {
+                    total: total,
+                    page: page,
+                },
+            })
             .build();
     }
 

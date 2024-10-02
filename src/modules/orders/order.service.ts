@@ -8,27 +8,44 @@ import { ChangeStatusDto } from "./dto/change-status.dto";
 
 @Injectable()
 export class OrderService {
-
     constructor(
-        @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
-        @InjectRepository(OrderDetail) private readonly orderDetailRepository: Repository<OrderDetail>,
+        @InjectRepository(Order)
+        private readonly orderRepository: Repository<Order>,
+        @InjectRepository(OrderDetail)
+        private readonly orderDetailRepository: Repository<OrderDetail>,
         private readonly dataSource: DataSource
-    ) { };
+    ) {}
 
     async getOrders() {
-        return await this.orderRepository.find({ relations: ['details'] });
+        return await this.orderRepository.find({ relations: ["details"] });
+    }
+
+    async getOrdersV2(limit, page) {
+        const skip = (page - 1) * limit;
+
+        return await this.orderRepository.findAndCount({
+            relations: ["details"],
+            skip: skip,
+            take: limit,
+        });
     }
 
     async getOrderByAccount(id: number) {
-        return await this.orderRepository.find({ where: { account: { id: id } }, relations: ['details'] });
+        return await this.orderRepository.find({
+            where: { account: { id: id } },
+            relations: ["details"],
+        });
     }
 
     async getOrderDetailsByOrderId(id: number) {
-        return await this.orderDetailRepository.find({ where: { order: { id: id } } });
+        return await this.orderDetailRepository.find({
+            where: { order: { id: id } },
+        });
     }
 
     async createOrder(data: CreateOrderDto) {
-        const { name, address, phone, email, note, total, pay, account_id } = data;
+        const { name, address, phone, email, note, total, pay, account_id } =
+            data;
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -36,8 +53,11 @@ export class OrderService {
         await queryRunner.startTransaction();
 
         try {
-            const result = await queryRunner.manager.query(`INSERT INTO orders (name, address, phone, email, note, total, pay, account_id) 
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`, [name, address, phone, email, note, total, pay, account_id]);
+            const result = await queryRunner.manager.query(
+                `INSERT INTO orders (name, address, phone, email, note, total, pay, account_id) 
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`,
+                [name, address, phone, email, note, total, pay, account_id]
+            );
             await queryRunner.commitTransaction();
             return result;
         } catch (err) {
@@ -63,14 +83,16 @@ export class OrderService {
 
         try {
             let result = null;
-            if (status === 'accept') {
+            if (status === "accept") {
                 result = await queryRunner.manager.query(
                     `UPDATE orders SET status=$1, pay=$2 WHERE id=$3  RETURNING *;`,
-                    [status, true, id]);
+                    [status, true, id]
+                );
             } else {
                 result = await queryRunner.manager.query(
                     `UPDATE orders SET status=$1 WHERE id=$2  RETURNING *;`,
-                    [status, id]);
+                    [status, id]
+                );
             }
 
             await queryRunner.commitTransaction();
