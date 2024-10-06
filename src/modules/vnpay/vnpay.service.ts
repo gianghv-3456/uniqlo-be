@@ -56,10 +56,12 @@ export class VnPayService {
         const hmac = crypto.createHmac("sha512", this.vnp_HashSecret);
         const signed = hmac.update(signData).digest("hex");
         vnp_Params["vnp_SecureHash"] = signed;
-        const url = (this.vnp_Url +=
-            "?" + querystring.stringify(vnp_Params, { encode: false }));
 
-        return url;
+        return (
+            this.vnp_Url +
+            "?" +
+            querystring.stringify(vnp_Params, { encode: false })
+        );
     }
 
     verifyReturnUrl(queryParams: any): boolean {
