@@ -10,6 +10,7 @@ import { MailerModule } from "./mailer/mailer.module";
 import { OrderModule } from "./orders/order.module";
 import { ProductModule } from "./products/product.module";
 import { VariationModule } from "./variations/variation.module";
+import { VnpayModule } from "./vnpay/vnpay.module";
 
 export const Modules = [
     AccountModule,
@@ -24,4 +25,5 @@ export const Modules = [
     EvaluationModule,
     MailerModule,
     CollectionModule,
+    VnpayModule,
 ];
