@@ -13,11 +13,11 @@ export class CreateBrandDto {
 
     logo: string;
 
-    @IsNumber()
+    // @IsNumber()
     category_id: number;
 
-    @IsArray()
+    // @IsArray()
     // @ArrayNotEmpty()
-    @IsInt({ each: true }) // Ensures each value in the array is an integer
+    // @IsInt({ each: true }) // Ensures each value in the array is an integer
     category_ids: number[];
 }

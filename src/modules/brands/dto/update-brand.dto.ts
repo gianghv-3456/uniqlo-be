@@ -16,12 +16,12 @@ export class UpdateBrandDto {
 
     logo: string;
 
-    @IsNumber()
+    // @IsNumber()
     category_id: number;
 
-    @IsArray()
+    // @IsArray()
     // @ArrayNotEmpty()
-    @IsInt({ each: true }) // Ensure each value in the array is an integer
+    // @IsInt({ each: true }) // Ensure each value in the array is an integer
     category_ids: number[];
 
     @IsBoolean()
