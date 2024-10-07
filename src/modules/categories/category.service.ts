@@ -37,6 +37,7 @@ export class CategoryService {
                 name,
                 brands,
             });
+            console.log("==>newCategory", newCategory);
 
             // Save the category with its associated brands
             return await this.categoryRepository.save(newCategory);
@@ -83,6 +84,7 @@ export class CategoryService {
 
             // Update the brands association
             category.brands = brands;
+            console.log("==>category", category);
 
             // Save the updated category entity
             return await this.categoryRepository.save(category);

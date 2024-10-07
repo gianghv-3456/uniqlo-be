@@ -17,8 +17,8 @@ export class UpdateCategoryDto {
     @IsBoolean()
     active: boolean;
 
-    @IsArray()
+    // @IsArray()
     // @ArrayNotEmpty()
-    @IsInt({ each: true }) // Ensures each value in the array is an integer
+    // @IsInt({ each: true }) // Ensures each value in the array is an integer
     brand_ids: number[]; // Array of brand IDs to associate with the category
 }
