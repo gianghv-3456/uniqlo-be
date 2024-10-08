@@ -38,7 +38,7 @@ export class CartControllerV2 {
     // }
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
-      .withMessage("Create successful cart")
+      .withMessage("Get successful cart")
       .withData(result)
       .build()
   }
@@ -96,12 +96,21 @@ export class CartControllerV2 {
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Delete successful cart")
+      .withData(result)
       .build()
   }
 
   @Put("update-quantity")
   async updateQuantity(@Body() body: UpdateQuantityDto) {
     const result = await this.cartService.updateQuantity(body)
+
+    if (!result) {
+      // throw new BadRequestException("No update");
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage("No update")
+        .build()
+    }
 
     // return {
     //     statusCode: HttpStatus.OK,
@@ -110,6 +119,7 @@ export class CartControllerV2 {
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Update successful cart")
+      .withData(result)
       .build()
   }
 }

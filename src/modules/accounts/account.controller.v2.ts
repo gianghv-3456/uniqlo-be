@@ -146,22 +146,26 @@ export class AccountControllerV2 {
     }
   }
 
-  @Put("update")
-  async update(@Req() request: Request, @Body() body: AcocuntUpdateDto) {
-    const authHeader = request.headers["authorization"]
-    const token = authHeader.substring(7)
-    if (!token) {
-      // throw new UnauthorizedException("Missing token");
+  @Put("update/:id")
+  async update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() body: AcocuntUpdateDto
+  ) {
+    const findId = await this.accountService.getAccountById(id)
+
+    console.log(findId)
+
+    if (!findId) {
+      // throw new NotFoundException("Account not found");
       return new ResponseBuilder2()
-        .withCode(ResponseCodeEnum.UNAUTHORIZED)
-        .withMessage("Missing token")
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage("Account not found")
         .build()
     }
 
-    const infoToken = await this.jwtService.verifyAsync(token, {
-      secret: JWT_CONFIG.ACCESS_KEY,
-    })
-    const { id } = infoToken
+    if (body.imagePath === null || body.imagePath === "") {
+      body.imagePath = findId.imagePath
+    }
 
     const accountUpdate = { id, ...body }
 
@@ -172,11 +176,6 @@ export class AccountControllerV2 {
     delete data.image_path
     delete data.password
 
-    // return {
-    //     statusCode: HttpStatus.OK,
-    //     message: "Information updated successfully",
-    //     data,
-    // };
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Information updated successfully")
@@ -200,7 +199,7 @@ export class AccountControllerV2 {
       .build()
   }
 
-  @Get("get-wishlists-by-account/:id")
+  @Get("wishlists/:id")
   async getWishlistByAccount(@Param("id", ParseIntPipe) id: number) {
     const result = await this.accountService.getWishlistByAccount(id)
 

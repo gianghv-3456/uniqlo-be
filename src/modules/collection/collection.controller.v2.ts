@@ -1,50 +1,27 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
-import { CollectionService } from "./collection.service"
+import { CollectionService2 } from "./collection.service.v2"
 import { CreateCollectionDto } from "./dto/create-collection.dto"
 import { UpdateCollectionDto } from "./dto/update-collection.dto"
-import { ResponseBuilder2 } from "src/utils/response-builder-v2"
 import { ResponseCodeEnum } from "src/common/constants/response-code.enum"
 
 @Controller("v2/collections")
 export class CollectionControllerV2 {
-  constructor(private readonly collectionService: CollectionService) {}
+  constructor(private readonly collectionService: CollectionService2) {}
 
   @Get()
   async getAll() {
     let allCollections = await this.collectionService.getAll()
-    return new ResponseBuilder2()
-      .withCode(ResponseCodeEnum.NOT_FOUND)
-      .withMessage("Successfully get all collections")
-      .withData(allCollections)
-      .build()
+    return allCollections
   }
 
   @Get("random")
   async getRandom(): Promise<any> {
-    let allCollections = await this.collectionService.getRandom()
-    return new ResponseBuilder2()
-      .withCode(ResponseCodeEnum.NOT_FOUND)
-      .withMessage("Successfully get random collections")
-      .withData(allCollections)
-      .build()
+    return await this.collectionService.getRandom()
   }
 
   @Get(":id")
   async findById(@Param("id") id: number) {
-    let result = await this.collectionService.findById(id)
-
-    if (!result) {
-      return new ResponseBuilder2()
-        .withCode(ResponseCodeEnum.NOT_FOUND)
-        .withMessage("Collection not found")
-        .build()
-    }
-
-    return new ResponseBuilder2()
-      .withCode(ResponseCodeEnum.NOT_FOUND)
-      .withMessage(" Successfully get collection by id")
-      .withData(result)
-      .build()
+    return await this.collectionService.findById(id)
   }
 
   @Post("create")

@@ -1,22 +1,17 @@
-import { IsEmail, IsEnum, IsNotEmpty, Length } from "class-validator";
-import { GENDER } from "src/common/constants/role.enum";
+import { IsEmail, IsEnum, IsNotEmpty, Length } from "class-validator"
+import { GENDER } from "src/common/constants/role.enum"
 
 export class AcocuntUpdateDto {
+  id?: number
 
-    id?: number;
+  @Length(4, 30)
+  name: string
 
-    @Length(4, 30)
-    name: string;
+  @Length(10, 10)
+  phone: string
 
-    @Length(10, 10)
-    phone: string;
+  @IsEnum(GENDER)
+  gender: string
 
-    @IsEmail()
-    email: string;
-
-    @IsEnum(GENDER)
-    gender: string;
-
-    @IsNotEmpty()
-    imagePath: string;
+  imagePath?: string
 }

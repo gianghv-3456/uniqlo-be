@@ -5,12 +5,12 @@ import { Repository } from "typeorm"
 import { Product } from "../products/entity/product.entity"
 import { CreateCollectionDto } from "./dto/create-collection.dto"
 import { ProductService } from "../products/product.service"
-import { ResponseBuilder } from "src/utils/response-builder"
+import { ResponseBuilder2 } from "src/utils/response-builder-v2"
 import { ResponseCodeEnum } from "src/common/constants/response-code.enum"
 import { UpdateCollectionDto } from "./dto/update-collection.dto"
 
 @Injectable()
-export class CollectionService {
+export class CollectionService2 {
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
@@ -23,7 +23,7 @@ export class CollectionService {
     })
     listCollection.sort((a, b) => a.id - b.id)
 
-    return new ResponseBuilder()
+    return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Get successful collections")
       .withData(listCollection)
@@ -37,7 +37,7 @@ export class CollectionService {
       })
 
       if (listCollection.length === 0) {
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.NOT_FOUND)
           .withMessage("No collections found")
           .build()
@@ -48,13 +48,13 @@ export class CollectionService {
 
       const randomCollection = listCollection[randomIndex]
 
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.SUCCESS)
         .withMessage("Get successful collections")
         .withData(randomCollection)
         .build()
     } catch (error) {
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
         .withMessage("Internal server error!")
         .build()
@@ -70,47 +70,19 @@ export class CollectionService {
         relations: ["products"],
       })
       if (!existCollection) {
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.NOT_FOUND)
           .withMessage("Collection not exist!")
           .build()
       }
 
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.SUCCESS)
         .withMessage("Find collection successfully!")
         .withData(existCollection)
         .build()
     } catch (error) {
-      return new ResponseBuilder()
-        .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
-        .withMessage("Internal server error!")
-        .build()
-    }
-  }
-
-  async findByIdV2(id: number): Promise<any> {
-    try {
-      const existCollection = await this.collectionRepository.findOne({
-        where: {
-          id: id,
-        },
-        relations: ["products"],
-      })
-      if (!existCollection) {
-        return new ResponseBuilder()
-          .withCode(ResponseCodeEnum.NOT_FOUND)
-          .withMessage("Collection not exist!")
-          .build()
-      }
-
-      return new ResponseBuilder()
-        .withCode(ResponseCodeEnum.SUCCESS)
-        .withMessage("Find collection successfully!")
-        .withData(existCollection)
-        .build()
-    } catch (error) {
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
         .withMessage("Internal server error!")
         .build()
@@ -131,13 +103,13 @@ export class CollectionService {
 
       await this.collectionRepository.save(newCollection)
 
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.CREATED)
         .withMessage("Create collection successfully!")
         .withData(newCollection)
         .build()
     } catch (error) {
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
         .withMessage("Internal server error!")
         .build()
@@ -158,7 +130,7 @@ export class CollectionService {
         relations: ["products"],
       })
       if (!existCollection) {
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.NOT_FOUND)
           .withMessage("Collection not exist!")
           .build()
@@ -174,13 +146,13 @@ export class CollectionService {
       const collectionUpdated =
         await this.collectionRepository.save(existCollection)
 
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.SUCCESS)
         .withMessage("Update collection successfully!")
         .withData(collectionUpdated)
         .build()
     } catch (error) {
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
         .withMessage("Internal server error")
         .build()
@@ -197,19 +169,19 @@ export class CollectionService {
       })
 
       if (!existCollection) {
-        return new ResponseBuilder()
+        return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.NOT_FOUND)
           .withMessage("Collection not exist!")
           .build()
       }
       await this.collectionRepository.remove(existCollection)
 
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.SUCCESS)
         .withMessage("Delete collection successfully!")
         .build()
     } catch (error) {
-      return new ResponseBuilder()
+      return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.INTERNAL_SERVER_ERROR)
         .withMessage("Internal server error")
         .build()
