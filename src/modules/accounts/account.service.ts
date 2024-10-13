@@ -99,8 +99,8 @@ export class AccountService {
         });
 
         if (wishlistFind) {
-            const result = await this.wishlistRepository.delete(wishlistFind);
-            return result;
+            await this.wishlistRepository.delete(wishlistFind);
+            return null;
         } else {
             const { accountId, productId } = data;
 
