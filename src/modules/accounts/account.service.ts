@@ -71,7 +71,7 @@ export class AccountService {
         const { email, role } = loginDto;
         const result = await this.accountRepository.findOne({
             where: { email, role },
-            relations: ["carts"],
+            relations: ["carts", "wishlists"],
         });
         console.log(result);
         return result;
@@ -94,13 +94,16 @@ export class AccountService {
 
     async changeWishlist(data: UpdateWishlistDto) {
         const { accountId, productId } = data;
+        console.log(data);
         const wishlistFind = await this.wishlistRepository.findOne({
             where: { account: { id: accountId }, product: { id: productId } },
         });
 
+        console.log(`wishlistFind`, wishlistFind);
+
         if (wishlistFind) {
-            await this.wishlistRepository.delete(wishlistFind);
-            return null;
+            const result = await this.wishlistRepository.delete(wishlistFind);
+            return result;
         } else {
             const { accountId, productId } = data;
 

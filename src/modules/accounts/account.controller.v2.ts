@@ -204,6 +204,7 @@ export class AccountControllerV2 {
     async getWishlistByAccount(@Param("id", ParseIntPipe) id: number) {
         const result = await this.accountService.getWishlistByAccount(id);
 
+<<<<<<< HEAD
         // return {
         //     statusCode: HttpStatus.OK,
         //     message: "Get wishlist successfully",
@@ -219,9 +220,46 @@ export class AccountControllerV2 {
     @Put("change-status")
     async updateStatus(@Body() body: UpdateStatusDto) {
         const result = await this.accountService.changeStatus(body);
+=======
+    if (resultChange) {
+      // return {
+      //     statusCode: HttpStatus.OK,
+      //     message: "Change password successfully",
+      //     data: resultChange,
+      // };
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.SUCCESS)
+        .withMessage("Change password successfully")
+        .withData(resultChange)
+        .build()
+    }
+  }
+
+  @Put("update/:id")
+  async update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() body: AcocuntUpdateDto
+  ) {
+    const findId = await this.accountService.getAccountById(id)
+
+    console.log(findId)
+
+    if (!findId) {
+      // throw new NotFoundException("Account not found");
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage("Account not found")
+        .build()
+    }
+
+    if (body.imagePath === null || body.imagePath === "") {
+      body.imagePath = findId.imagePath
+    }
+>>>>>>> 69affc0825778fe2588c0b6a4d03507ed76c9b00
 
         console.log(result);
 
+<<<<<<< HEAD
         // return {
         //     statusCode: HttpStatus.OK,
         //     message: "Update status successfully",
@@ -233,4 +271,69 @@ export class AccountControllerV2 {
             .withData(body)
             .build();
     }
+=======
+    const result = await this.accountService.update(accountUpdate)
+    const data = result.raw[0]
+    const imagePath = data.image_path
+    data.imagePath = imagePath
+    delete data.image_path
+    delete data.password
+
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Information updated successfully")
+      .withData(data)
+      .build()
+  }
+
+  @Put("change-wishlists")
+  async changeWishlist(@Body() body: UpdateWishlistDto) {
+    const result = await this.accountService.changeWishlist(body)
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Change wishlist successfully",
+    //     data: result,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Change wishlist successfully")
+      .withData(result)
+      .build()
+  }
+
+  @Get("wishlists/:id")
+  async getWishlistByAccount(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.accountService.getWishlistByAccount(id)
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Get wishlist successfully",
+    //     data: result,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get wishlist successfully")
+      .withData(result)
+      .build()
+  }
+
+  @Put("change-status")
+  async updateStatus(@Body() body: UpdateStatusDto) {
+    const result = await this.accountService.changeStatus(body)
+
+    console.log(result)
+
+    // return {
+    //     statusCode: HttpStatus.OK,
+    //     message: "Update status successfully",
+    //     data: body,
+    // };
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Update status successfully")
+      .withData(body)
+      .build()
+  }
+>>>>>>> 69affc0825778fe2588c0b6a4d03507ed76c9b00
 }

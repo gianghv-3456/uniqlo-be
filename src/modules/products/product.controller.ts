@@ -126,6 +126,7 @@ export class ProductController {
         //     data: result,
         // };
         return new ResponseBuilder()
+            .withData(result)
             .withCode(ResponseCodeEnum.SUCCESS)
             .withMessage("Delete successful product")
             .build();

@@ -11,8 +11,8 @@ export class CreateCategoryDto {
     @Length(2, 30)
     name: string;
 
-    @IsArray()
+    // @IsArray()
     // @ArrayNotEmpty()
-    @IsInt({ each: true }) // Ensure each value in the array is an integer
+    // @IsInt({ each: true }) // Ensure each value in the array is an integer
     brand_ids: number[]; // Accept an array of brand IDs
 }

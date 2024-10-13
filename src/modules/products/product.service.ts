@@ -42,7 +42,7 @@ export class ProductService {
   async getById(id: number) {
     return await this.productRepository.findOne({
       where: { id },
-      relations: ["brand", "images", "variations"],
+      relations: ["brand", "images", "variations", "category"],
     })
   }
 
@@ -135,26 +135,20 @@ export class ProductService {
         select: ["id", "name"],
       })
 
-      const queryRunner = this.dataSource.createQueryRunner()
+      // const queryRunner = this.dataSource.createQueryRunner()
 
-      await queryRunner.connect()
-      await queryRunner.startTransaction()
+      // await queryRunner.connect()
+      // await queryRunner.startTransaction()
 
-      try {
-        const result = await queryRunner.manager.query(
-          `UPDATE variations SET stock = 0 WHERE product_id = $1;`,
-          [products.id]
-        )
+      // try {
+      //   const result = await queryRunner.manager.query(
+      //     `UPDATE variations SET stock = 0 WHERE product_id = $1;`,
+      //     [products.id]
+      //   )
 
-        await queryRunner.commitTransaction()
-        return result
-      } catch (err) {
-        await queryRunner.rollbackTransaction()
-        console.log(err)
-        return err
-      } finally {
-        await queryRunner.release()
-      }
+      //   await queryRunner.commitTransaction()
+      const result = await this.productRepository.delete(id)
+      return result
       // return products;
     } catch (error) {
       console.log(error)

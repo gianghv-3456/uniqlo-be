@@ -64,7 +64,6 @@ export class AuthControllerV2 {
         !bcrypt.compareSync(loginDto.password, account.password) &&
         !bcrypt.compareSync(loginDto.password, account.passwordReset)
       ) {
-        // throw new UnauthorizedException('Incorrect password')
         return new ResponseBuilder2()
           .withCode(ResponseCodeEnum.UNAUTHORIZED)
           .withMessage("Incorrect password")
@@ -74,13 +73,22 @@ export class AuthControllerV2 {
 
     const resultSetPassword = await this.accountService.setPassword(account.id)
     if (resultSetPassword.affected !== 1) {
-      // throw new BadRequestException("Error update password");
       return new ResponseBuilder2()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage("Error update password")
         .build()
     }
     // ================================================================
+
+    const wishlists = await this.accountService.getWishlistByAccount(account.id)
+
+    let wishlistArray = []
+
+    wishlists.forEach((wishlist) => {
+      delete wishlist.account_id
+      delete wishlist.id
+      wishlistArray.push(wishlist.product_id)
+    })
 
     const { id, role } = account
 
@@ -90,12 +98,9 @@ export class AuthControllerV2 {
     })
 
     delete account.password
+    delete account.passwordReset
+    account.wishlists = wishlistArray
 
-    // return {
-    //     statusCode: HttpStatus.OK,
-    //     message: "Logged in successfully",
-    //     data: { ...account, accessToken, refreshToken }
-    // }
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage("Logged in successfully")

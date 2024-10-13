@@ -5,6 +5,7 @@ import { JWT_CONFIG } from "src/common/constants/jwt.constant"
 import { CollectionController } from "./collection.controller"
 import { CollectionControllerV2 } from "./collection.controller.v2"
 import { CollectionService } from "./collection.service"
+import { CollectionService2 } from "./collection.service.v2"
 import { Collection } from "./entity/conllection.entity"
 import { ProductService } from "../products/product.service"
 import { ProductModule } from "../products/product.module"
@@ -21,6 +22,6 @@ import { Variation } from "../variations/entity/variation.entity"
     }),
   ],
   controllers: [CollectionController, CollectionControllerV2],
-  providers: [CollectionService, ProductService],
+  providers: [CollectionService, CollectionService2, ProductService],
 })
 export class CollectionModule {}

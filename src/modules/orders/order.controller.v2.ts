@@ -36,7 +36,7 @@ export class OrderControllerV2 {
     // };
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
-      .withMessage("Get successful variation")
+      .withMessage("Get successful orders")
       .withData(result)
       .build()
   }
@@ -48,7 +48,7 @@ export class OrderControllerV2 {
 
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
-      .withMessage("Get successful variation")
+      .withMessage("Get successful orders")
       .withData({
         items: result,
         meta: {
@@ -70,7 +70,7 @@ export class OrderControllerV2 {
     // };
     return new ResponseBuilder2()
       .withCode(ResponseCodeEnum.SUCCESS)
-      .withMessage("Get successful variation")
+      .withMessage("Get successful orders")
       .withData(result)
       .build()
   }
