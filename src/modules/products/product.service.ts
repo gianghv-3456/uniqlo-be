@@ -7,7 +7,7 @@ import { Image } from "../images/entity/image.entity"
 import { Variation } from "../variations/entity/variation.entity"
 import axios from "axios"
 
-const RECOMMEND_BASE_URL = "https://012a-1-55-242-188.ngrok-free.app"
+const RECOMMEND_BASE_URL = "https://9d8c-118-71-137-137.ngrok-free.app"
 
 @Injectable()
 export class ProductService {
