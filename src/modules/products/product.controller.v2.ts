@@ -175,4 +175,42 @@ export class ProductControllerV2 {
       .withMessage("Update successful product")
       .build()
   }
+
+  @Get("urecommend/:id")
+  async getRecommendProduct(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.productService.getUserRecommendation(id)
+
+    if (!result) {
+      // throw new BadRequestException(result.detail);
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(result.detail)
+        .build()
+    }
+
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get successful product")
+      .withData(result)
+      .build()
+  }
+
+  @Get("precommend/:id")
+  async getProductRecommend(@Param("id", ParseIntPipe) id: number) {
+    const result = await this.productService.getProductRecommendation(id)
+
+    if (!result) {
+      // throw new BadRequestException(result.detail);
+      return new ResponseBuilder2()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(result.detail)
+        .build()
+    }
+
+    return new ResponseBuilder2()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage("Get successful product")
+      .withData(result)
+      .build()
+  }
 }

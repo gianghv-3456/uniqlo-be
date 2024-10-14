@@ -5,6 +5,9 @@ import { DataSource, EntityManager, In, Repository } from "typeorm"
 import { CreateProductDto } from "./dto/create-product.dto"
 import { Image } from "../images/entity/image.entity"
 import { Variation } from "../variations/entity/variation.entity"
+import axios from "axios"
+
+const RECOMMEND_BASE_URL = "https://012a-1-55-242-188.ngrok-free.app"
 
 @Injectable()
 export class ProductService {
@@ -206,6 +209,40 @@ export class ProductService {
       return err
     } finally {
       await queryRunner.release()
+    }
+  }
+
+  async getUserRecommendation(userId: number) {
+    try {
+      const response = await axios.get(
+        `${RECOMMEND_BASE_URL}/cfrecommend/${userId}`
+      )
+
+      if (response.status === 200 && response.data.statusCode === 200) {
+        return response.data.data
+      } else {
+        throw new Error("Server returned an error")
+      }
+    } catch (err) {
+      console.log(err)
+      return err
+    }
+  }
+
+  async getProductRecommendation(productId: number) {
+    try {
+      const response = await axios.get(
+        `${RECOMMEND_BASE_URL}/recommend/${productId}`
+      )
+
+      if (response.status === 200 && response.data.statusCode === 200) {
+        return response.data.data
+      } else {
+        throw new Error("Server returned an error")
+      }
+    } catch (err) {
+      console.log(err)
+      return err
     }
   }
 }
