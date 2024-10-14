@@ -17,7 +17,17 @@ export class OrderService {
     ) {}
 
     async getOrders() {
-        return await this.orderRepository.find({ relations: ["details"] });
+        const result = await this.orderRepository.find({
+            relations: ["details", "account"],
+        });
+
+        return result?.map((order) => ({
+            ...order,
+            details: order.details.map((detail) => ({
+                ...detail,
+                variation: JSON.parse(detail.variation),
+            })),
+        }));
     }
 
     async getOrdersV2(limit, page) {
@@ -31,10 +41,18 @@ export class OrderService {
     }
 
     async getOrderByAccount(id: number) {
-        return await this.orderRepository.find({
+        const result = await this.orderRepository.find({
             where: { account: { id: id } },
-            relations: ["details"],
+            relations: ["details", "account"],
         });
+
+        return result?.map((order) => ({
+            ...order,
+            details: order.details.map((detail) => ({
+                ...detail,
+                variation: JSON.parse(detail.variation),
+            })),
+        }));
     }
 
     async getOrderDetailsByOrderId(id: number) {
