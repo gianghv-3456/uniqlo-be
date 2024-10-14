@@ -221,11 +221,14 @@ export class ProductService {
       if (response.status === 200 && response.data.statusCode === 200) {
         return response.data.data
       } else {
-        throw new Error("Server returned an error")
+        console.log(response.data)
+        return null
       }
     } catch (err) {
       console.log(err)
-      return err
+    } finally {
+      console.log("Finally")
+      return null
     }
   }
 
@@ -238,11 +241,14 @@ export class ProductService {
       if (response.status === 200 && response.data.statusCode === 200) {
         return response.data.data
       } else {
-        throw new Error("Server returned an error")
+        console.log(response.data)
+        return null
       }
     } catch (err) {
       console.log(err)
-      return err
+    } finally {
+      console.log("Finally")
+      return null
     }
   }
 }

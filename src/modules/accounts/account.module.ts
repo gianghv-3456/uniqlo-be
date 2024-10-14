@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Account } from "./entity/account.entity"
+import { Product } from "../products/entity/product.entity"
 import { AccountController } from "./account.controller"
 import { AccountControllerV2 } from "./account.controller.v2"
 import { AccountService } from "./account.service"
@@ -10,7 +11,7 @@ import { Wishlist } from "./entity/wishlist.entity"
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Account, Wishlist]),
+    TypeOrmModule.forFeature([Account, Wishlist, Product]),
     JwtModule.register({
       secret: JWT_CONFIG.ACCESS_KEY,
       signOptions: { expiresIn: JWT_CONFIG.ACCESS_TIME },

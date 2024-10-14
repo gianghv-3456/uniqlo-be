@@ -1,12 +1,14 @@
-import { IsNumber } from "class-validator";
+import { IsBoolean, IsNumber } from "class-validator"
 
 export class UpdateWishlistDto {
+  id?: number
 
-    id?: number;
+  @IsNumber()
+  accountId: number
 
-    @IsNumber()
-    accountId: number;
+  @IsNumber()
+  productId: number
 
-    @IsNumber()
-    productId: number;
+  @IsBoolean()
+  isFavorite: boolean
 }
