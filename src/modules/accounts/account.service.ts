@@ -148,7 +148,7 @@ export class AccountService {
           [accountId, productId]
         )
         await queryRunner.commitTransaction()
-        return result
+        return "done"
       } catch (err) {
         await queryRunner.rollbackTransaction()
         // console.log(err.message);

@@ -226,6 +226,7 @@ export class ProductService {
       }
     } catch (err) {
       console.log(err)
+      return null
     } finally {
       console.log("Finally")
       return null

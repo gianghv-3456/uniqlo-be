@@ -181,10 +181,11 @@ export class ProductControllerV2 {
     const result = await this.productService.getUserRecommendation(id)
 
     if (!result) {
-      // throw new BadRequestException(result.detail);
+      const emptyData = []
       return new ResponseBuilder2()
-        .withCode(ResponseCodeEnum.BAD_REQUEST)
-        .withMessage(result.detail)
+        .withCode(ResponseCodeEnum.SUCCESS)
+        .withMessage("Get successful product")
+        .withData(emptyData)
         .build()
     }
 
@@ -200,10 +201,11 @@ export class ProductControllerV2 {
     const result = await this.productService.getProductRecommendation(id)
 
     if (!result) {
-      // throw new BadRequestException(result.detail);
+      const emptyData = []
       return new ResponseBuilder2()
-        .withCode(ResponseCodeEnum.BAD_REQUEST)
-        .withMessage(result.detail)
+        .withCode(ResponseCodeEnum.SUCCESS)
+        .withMessage("Get successful product")
+        .withData(emptyData)
         .build()
     }
 
