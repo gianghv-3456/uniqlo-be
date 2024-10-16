@@ -121,6 +121,8 @@ export class OrderControllerV2 {
             await this.orderService.createOrderDetail(orderDetail);
 
         if (resultOrderDetail.length > 0) {
+            await this.cartService.deleteMany(cart.map((item) => item.id));
+
             return new ResponseBuilder2()
                 .withCode(ResponseCodeEnum.SUCCESS)
                 .withMessage("Create successful order")
