@@ -1,7 +1,16 @@
-import { IsBoolean, IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
+import {
+    IsArray,
+    IsBoolean,
+    IsEmail,
+    IsEmpty,
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+    Length,
+} from "class-validator";
+import { Cart } from "src/modules/carts/entity/cart.entity";
 
 export class CreateOrderDto {
-
     @IsNumber()
     account_id: number;
 
@@ -28,4 +37,8 @@ export class CreateOrderDto {
     @IsNotEmpty()
     @IsBoolean()
     pay: boolean;
+
+    @IsArray()
+    @IsNotEmpty()
+    products: Cart[];
 }
