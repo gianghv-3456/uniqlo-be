@@ -90,7 +90,7 @@ export class OrderControllerV2 {
                 .build();
         }
 
-        const cart = await this.cartService.getCartById(body.account_id);
+        const cart = body.products;
 
         const orderDetail = [];
         for (let i = 0; i < cart.length; i++) {
@@ -121,21 +121,11 @@ export class OrderControllerV2 {
             await this.orderService.createOrderDetail(orderDetail);
 
         if (resultOrderDetail.length > 0) {
-            const resultDeleteCart =
-                await this.cartService.deleteCartByAccountId(body.account_id);
-
-            if (resultDeleteCart.affected > 0) {
-                // return {
-                //     statusCode: HttpStatus.OK,
-                //     message: "Create successful order",
-                //     data: result
-                // }
-                return new ResponseBuilder2()
-                    .withCode(ResponseCodeEnum.SUCCESS)
-                    .withMessage("Create successful order")
-                    .withData(result)
-                    .build();
-            }
+            return new ResponseBuilder2()
+                .withCode(ResponseCodeEnum.SUCCESS)
+                .withMessage("Create successful order")
+                .withData(result)
+                .build();
         }
     }
 
